@@ -12,12 +12,11 @@ const partnerRestaurants = [
   { id: 10, name: "Baking & Cafe Bistro", location: "Northern Ave 6, Yerevan", avgKg: 25 }
 ];
 
-// Translations dictionary
 const i18n = {
   hy: {
     appTitle: "🌱 EcoWaste Armenia",
     appSubtitle: "Օրգանական թափոնների կառավարման և կոմպոստացման հարթակ",
-    langLabel: "🌐 Լեզու / Language:",
+    langLabel: "🌐 Լեզու:",
     stat1Title: "Հավաքված թափոն",
     stat2Title: "Խնայված CO₂",
     stat3Title: "Գործընկեր ռեստորաններ",
@@ -25,7 +24,7 @@ const i18n = {
     restSelectLabel: "Ընտրել Ռեստորանը",
     selectPlaceholder: "-- Ընտրեք ցանկից --",
     restLocLabel: "Հասցե/Վայր",
-    restWeightLabel: "Օրական Կանխատեսվող Աղբ (կգ)",
+    restWeightLabel: "Մոտավոր Քանակ (կգ)",
     btnPickup: "Գրանցել Հավաքագրման Պատվեր",
     farmerFormTitle: "🚜 Ֆերմերների համար (Կոմպոստի Պատվեր)",
     farmerNameLabel: "Գնորդ / Ֆերմերային Տնտեսություն",
@@ -46,7 +45,7 @@ const i18n = {
   en: {
     appTitle: "🌱 EcoWaste Armenia",
     appSubtitle: "Organic Waste Management & Composting Platform",
-    langLabel: "🌐 Language / Լեզու:",
+    langLabel: "🌐 Language:",
     stat1Title: "Total Waste Collected",
     stat2Title: "CO₂ Saved",
     stat3Title: "Partner Restaurants",
@@ -54,7 +53,7 @@ const i18n = {
     restSelectLabel: "Select Restaurant",
     selectPlaceholder: "-- Select from list --",
     restLocLabel: "Address / Location",
-    restWeightLabel: "Estimated Waste Volume (kg)",
+    restWeightLabel: "Estimated Volume (kg)",
     btnPickup: "Schedule Waste Pickup",
     farmerFormTitle: "🚜 For Farmers (Order Compost)",
     farmerNameLabel: "Buyer / Farm Enterprise",
@@ -75,7 +74,7 @@ const i18n = {
   ru: {
     appTitle: "🌱 EcoWaste Armenia",
     appSubtitle: "Платформа управления органическими отходами и компостирования",
-    langLabel: "🌐 Язык / Language:",
+    langLabel: "🌐 Язык:",
     stat1Title: "Собрано отходов",
     stat2Title: "Сэкономлено CO₂",
     stat3Title: "Рестораны-партнеры",
@@ -110,14 +109,12 @@ document.addEventListener('DOMContentLoaded', () => {
   fetchStats();
   fetchPickups();
 
-  // Language Change Event
   document.getElementById('langSelect').addEventListener('change', (e) => {
     currentLang = e.target.value;
     applyLanguage(currentLang);
-    fetchPickups(); // Refresh table to update status text language
+    fetchPickups();
   });
 
-  // Restaurant Select Event (Auto fill location and avg weight)
   document.getElementById('restSelect').addEventListener('change', (e) => {
     const selectedId = parseInt(e.target.value);
     const rest = partnerRestaurants.find(r => r.id === selectedId);
@@ -127,11 +124,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Pickup Form Submit
   document.getElementById('pickupForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     const selectElem = document.getElementById('restSelect');
-    const restaurantName = selectElem.options[selectElem.selectedIndex].text;
+    const restaurantName = selectElem.options[selectElem.selectedIndex].text.split(' (')[0];
     const location = document.getElementById('restLoc').value;
     const weightKg = document.getElementById('restWeight').value;
 
@@ -144,12 +140,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if (res.ok) {
       alert(i18n[currentLang].alertPickup);
       document.getElementById('pickupForm').reset();
+      document.getElementById('restLoc').value = '';
       fetchStats();
       fetchPickups();
     }
   });
 
-  // Farmer Order Submit
   document.getElementById('orderForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     const buyer = document.getElementById('farmerName').value;
@@ -183,7 +179,6 @@ function populateRestaurantSelect() {
 
 function applyLanguage(lang) {
   const t = i18n[lang];
-  
   document.getElementById('appTitle').innerText = t.appTitle;
   document.getElementById('appSubtitle').innerText = t.appSubtitle;
   document.getElementById('langLabel').innerText = t.langLabel;
@@ -207,15 +202,14 @@ function applyLanguage(lang) {
   document.getElementById('thStatus').innerText = t.thStatus;
   document.getElementById('footerText').innerText = t.footerText;
 
-  // Refresh select placeholder
   populateRestaurantSelect();
 }
 
 async function fetchStats() {
   const res = await fetch('/api/stats');
   const data = await res.json();
-  document.getElementById('totalWaste').innerText = `${data.totalWasteKg} kg`;
-  document.getElementById('co2Saved').innerText = `${data.co2SavedKg} kg`;
+  document.getElementById('totalWaste').innerText = `${data.totalWasteKg} կգ`;
+  document.getElementById('co2Saved').innerText = `${data.co2SavedKg} կգ`;
   document.getElementById('activeRestaurants').innerText = partnerRestaurants.length;
 }
 
@@ -236,7 +230,7 @@ async function fetchPickups() {
       <td>#${p.id}</td>
       <td><strong>${p.restaurant}</strong></td>
       <td>${p.location}</td>
-      <td>${p.weightKg} kg</td>
+      <td>${p.weightKg} կգ</td>
       <td><span style="color: ${isCompleted ? '#2e7d32' : '#ed6c02'}; font-weight:600;">● ${statusText}</span></td>
     `;
     tbody.appendChild(tr);
