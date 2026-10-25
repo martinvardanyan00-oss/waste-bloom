@@ -23,10 +23,10 @@ body {
 header {
   background: linear-gradient(135deg, #1b5e20, #2e7d32);
   color: white;
-  padding: 24px 0;
+  padding: 25px 0;
 }
 
-.header-top {
+.header-top-original {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -34,22 +34,22 @@ header {
   gap: 15px;
 }
 
-header h1 { margin: 0; font-size: 2rem; }
-header p { opacity: 0.9; margin-top: 8px; font-size: 1.05rem; }
+header h1 { margin: 0; font-size: 2.2rem; }
+header p { opacity: 0.9; margin-top: 6px; font-size: 1rem; }
 
 .lang-switcher {
-  display: flex;
-  align-items: center;
-  gap: 8px;
   background: rgba(255, 255, 255, 0.15);
   padding: 6px 12px;
   border-radius: 8px;
-  backdrop-filter: blur(5px);
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .lang-switcher label {
   font-size: 0.85rem;
   font-weight: 600;
+  color: white;
 }
 
 .lang-switcher select {
@@ -57,9 +57,9 @@ header p { opacity: 0.9; margin-top: 8px; font-size: 1.05rem; }
   border-radius: 6px;
   border: none;
   font-weight: 600;
-  cursor: pointer;
-  background-color: white;
+  background: white;
   color: #333;
+  cursor: pointer;
 }
 
 .stats-grid {
@@ -94,6 +94,7 @@ form {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  margin-top: 10px;
 }
 
 label { font-weight: 600; font-size: 0.9rem; }
@@ -103,6 +104,12 @@ input, select {
   border: 1px solid #ccc;
   border-radius: 6px;
   font-size: 1rem;
+  background-color: #fff;
+}
+
+input[readonly] {
+  background-color: #f9f9f9;
+  color: #555;
 }
 
 .btn {
