@@ -10,19 +10,21 @@
 <body>
   <header>
     <div class="container header-content">
-      <div class="header-top">
-        <h1 id="appTitle">🌱 EcoWaste Armenia</h1>
-        <!-- Language Switcher Selector -->
+      <div class="header-top-original">
+        <div class="header-titles">
+          <h1 id="appTitle">🌱 EcoWaste Armenia</h1>
+          <p id="appSubtitle">Օրգանական թափոնների կառավարման և կոմպոստացման հարթակ</p>
+        </div>
+        <!-- Clean Language Switcher -->
         <div class="lang-switcher">
-          <label for="langSelect" id="langLabel">🌐 Լեզու / Language:</label>
+          <label for="langSelect" id="langLabel">🌐 Լեզու:</label>
           <select id="langSelect">
-            <option value="hy" selected>🇦🇲 Հայերեն</option>
-            <option value="en">🇬🇧 English</option>
-            <option value="ru">🇷🇺 Русский</option>
+            <option value="hy" selected>Հայերեն</option>
+            <option value="en">English</option>
+            <option value="ru">Русский</option>
           </select>
         </div>
       </div>
-      <p id="appSubtitle">Օրգանական թափոնների կառավարման և կոմպոստացման հարթակ</p>
     </div>
   </header>
 
@@ -31,11 +33,11 @@
     <section class="stats-grid">
       <div class="card">
         <h3 id="stat1Title">Հավաքված թափոն</h3>
-        <p class="stat-num" id="totalWaste">0 kg</p>
+        <p class="stat-num" id="totalWaste">0 կգ</p>
       </div>
       <div class="card">
         <h3 id="stat2Title">Խնայված CO₂</h3>
-        <p class="stat-num" id="co2Saved">0 kg</p>
+        <p class="stat-num" id="co2Saved">0 կգ</p>
       </div>
       <div class="card">
         <h3 id="stat3Title">Գործընկեր ռեստորաններ</h3>
@@ -52,14 +54,13 @@
           <label id="restSelectLabel">Ընտրել Ռեստորանը</label>
           <select id="restSelect" required>
             <option value="" disabled selected>-- Ընտրեք ցանկից --</option>
-            <!-- 10 partner restaurants populating dynamically -->
           </select>
-
+          
           <label id="restLocLabel">Հասցե/Վայր</label>
           <input type="text" id="restLoc" placeholder="օր. Իսահակյան փ., Երևան" readonly required>
           
-          <label id="restWeightLabel">Օրական Կանխատեսվող Աղբ (կգ)</label>
-          <input type="number" id="restWeight" placeholder="35" required>
+          <label id="restWeightLabel">Մոտավոր Քանակ (կգ)</label>
+          <input type="number" id="restWeight" placeholder="օր. 35" required>
           
           <button type="submit" class="btn btn-primary" id="btnPickup">Գրանցել Հավաքագրման Պատվեր</button>
         </form>
@@ -68,4 +69,45 @@
       <!-- Farmer Order Form -->
       <div class="card form-card">
         <h2 id="farmerFormTitle">🚜 Ֆերմերների համար (Կոմպոստի Պատվեր)</h2>
-        <form id
+        <form id="orderForm">
+          <label id="farmerNameLabel">Գնորդ / Ֆերմերային Տնտեսություն</label>
+          <input type="text" id="farmerName" placeholder="օր. Արարատյան Դաշտ Ֆերմա" required>
+          
+          <label id="farmerLocLabel">Մարզ / Բնակավայր</label>
+          <input type="text" id="farmerLoc" placeholder="օր. Արմավիր" required>
+          
+          <label id="farmerQtyLabel">Քանակ (Տոննա)</label>
+          <input type="number" step="0.1" id="farmerQty" placeholder="օր. 1.5" required>
+          
+          <button type="submit" class="btn btn-secondary" id="btnOrder">Պատվիրել Պարարտանյութ</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- Pickup List Table -->
+    <section class="card table-card">
+      <h2 id="tableTitle">📋 Վերջին Հավաքագրման Հայտերը</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th id="thRest">Ռեստորան</th>
+            <th id="thAddress">Հասցե</th>
+            <th id="thWeight">Քանակ (կգ)</th>
+            <th id="thStatus">Կարգավիճակ</th>
+          </tr>
+        </thead>
+        <tbody id="pickupTableBody">
+          <!-- Dynamic JS Injection -->
+        </tbody>
+      </table>
+    </section>
+  </main>
+
+  <footer>
+    <p id="footerText">© 2026 EcoWaste Armenia Demo Platform | Pilot Validation Stage</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
