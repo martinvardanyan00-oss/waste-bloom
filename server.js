@@ -9,24 +9,26 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Mock Data Storage (In-memory for Demo)
+// Initial realistic mock data
 let pickups = [
-  { id: 1, restaurant: "Loona Restaurant", location: "Isahakyan St, Yerevan", weightKg: 45, status: "Completed", date: "2026-10-24" },
-  { id: 2, restaurant: "Narnia Sushi", location: "Pushkin St, Yerevan", weightKg: 30, status: "Pending", date: "2026-10-25" }
+  { id: 1, restaurant: "Loona Italian Restaurant", location: "Isahakyan St 28, Yerevan", weightKg: 55, status: "Completed", date: "2026-10-24" },
+  { id: 2, restaurant: "Lavash Dining", location: "Tumanyan St 21, Yerevan", weightKg: 85, status: "Completed", date: "2026-10-24" },
+  { id: 3, restaurant: "Narnia Sushi Bar", location: "Pushkin St 12, Yerevan", weightKg: 35, status: "Pending", date: "2026-10-25" },
+  { id: 4, restaurant: "Tavern Yerevan", location: "Amiryan St 5, Yerevan", weightKg: 90, status: "Pending", date: "2026-10-25" }
 ];
 
 let compostOrders = [
-  { id: 1, buyer: "Ararat Valley Farm", quantityTons: 2, location: "Armavir", status: "Confirmed" }
+  { id: 1, buyer: "Ararat Valley Farm", quantityTons: 2.5, location: "Armavir", status: "Confirmed" }
 ];
 
 // API Endpoints
 app.get('/api/stats', (req, res) => {
   const totalWaste = pickups.reduce((sum, p) => sum + p.weightKg, 0);
-  const co2Saved = (totalWaste * 0.5).toFixed(1); // 0.5 kg CO2 per kg organic waste
+  const co2Saved = (totalWaste * 0.52).toFixed(1); // ~0.52 kg CO2 saved per 1 kg diverted organic waste
   res.json({
     totalWasteKg: totalWaste,
     co2SavedKg: co2Saved,
-    activeRestaurants: pickups.length,
+    activeRestaurants: 10,
     compostDeliveredTons: 2.5
   });
 });
@@ -43,7 +45,7 @@ app.post('/api/pickups', (req, res) => {
   const newPickup = {
     id: pickups.length + 1,
     restaurant,
-    location: location || "Yerevan Center",
+    location: location || "Yerevan",
     weightKg: parseFloat(weightKg),
     status: "Pending",
     date: new Date().toISOString().split('T')[0]
