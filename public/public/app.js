@@ -1,4 +1,3 @@
-// 10 Preset Partner Restaurants with realistic data
 const partnerRestaurants = [
   { id: 1, name: "Loona Italian Restaurant", location: "Isahakyan St 28, Yerevan", avgKg: 55 },
   { id: 2, name: "Narnia Sushi Bar", location: "Pushkin St 12, Yerevan", avgKg: 35 },
@@ -112,140 +111,172 @@ let currentLang = 'hy';
 
 document.addEventListener('DOMContentLoaded', () => {
   const langSelect = document.getElementById('langSelect');
-  langSelect.value = currentLang;
+  if (langSelect) {
+    langSelect.value = currentLang;
+    langSelect.addEventListener('change', (e) => {
+      currentLang = e.target.value;
+      applyLanguage(currentLang);
+      fetchPickups();
+    });
+  }
 
   populateRestaurantSelect();
   fetchStats();
   fetchPickups();
 
-  langSelect.addEventListener('change', (e) => {
-    currentLang = e.target.value;
-    applyLanguage(currentLang);
-    fetchPickups();
-  });
-
-  document.getElementById('restSelect').addEventListener('change', (e) => {
-    const selectedId = parseInt(e.target.value);
-    const rest = partnerRestaurants.find(r => r.id === selectedId);
-    if (rest) {
-      document.getElementById('restLoc').value = rest.location;
-      document.getElementById('restWeight').value = rest.avgKg;
-    }
-  });
-
-  document.getElementById('pickupForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const selectElem = document.getElementById('restSelect');
-    if (!selectElem.value) return;
-    const restaurantName = selectElem.options[selectElem.selectedIndex].text.split(' (')[0];
-    const location = document.getElementById('restLoc').value;
-    const weightKg = document.getElementById('restWeight').value;
-
-    const res = await fetch('/api/pickups', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ restaurant: restaurantName, location, weightKg })
+  const restSelect = document.getElementById('restSelect');
+  if (restSelect) {
+    restSelect.addEventListener('change', (e) => {
+      const selectedId = parseInt(e.target.value);
+      const rest = partnerRestaurants.find(r => r.id === selectedId);
+      if (rest) {
+        document.getElementById('restLoc').value = rest.location;
+        document.getElementById('restWeight').value = rest.avgKg;
+      }
     });
+  }
 
-    if (res.ok) {
-      alert(i18n[currentLang].alertPickup);
-      document.getElementById('pickupForm').reset();
-      document.getElementById('restLoc').value = '';
-      populateRestaurantSelect();
-      fetchStats();
-      fetchPickups();
-    }
-  });
+  const pickupForm = document.getElementById('pickupForm');
+  if (pickupForm) {
+    pickupForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const selectElem = document.getElementById('restSelect');
+      if (!selectElem || !selectElem.value) return;
+      const restaurantName = selectElem.options[selectElem.selectedIndex].text.split(' (')[0];
+      const location = document.getElementById('restLoc').value;
+      const weightKg = document.getElementById('restWeight').value;
 
-  document.getElementById('orderForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const buyer = document.getElementById('farmerName').value;
-    const location = document.getElementById('farmerLoc').value;
-    const quantityTons = document.getElementById('farmerQty').value;
+      const res = await fetch('/api/pickups', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ restaurant: restaurantName, location, weightKg })
+      });
 
-    const res = await fetch('/api/orders', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ buyer, location, quantityTons })
+      if (res.ok) {
+        alert(i18n[currentLang].alertPickup);
+        pickupForm.reset();
+        document.getElementById('restLoc').value = '';
+        populateRestaurantSelect();
+        fetchStats();
+        fetchPickups();
+      }
     });
+  }
 
-    if (res.ok) {
-      alert(i18n[currentLang].alertOrder);
-      document.getElementById('orderForm').reset();
-    }
-  });
+  const orderForm = document.getElementById('orderForm');
+  if (orderForm) {
+    orderForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const buyer = document.getElementById('farmerName').value;
+      const location = document.getElementById('farmerLoc').value;
+      const quantityTons = document.getElementById('farmerQty').value;
+
+      const res = await fetch('/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ buyer, location, quantityTons })
+      });
+
+      if (res.ok) {
+        alert(i18n[currentLang].alertOrder);
+        orderForm.reset();
+      }
+    });
+  }
 });
 
 function populateRestaurantSelect() {
   const select = document.getElementById('restSelect');
-  select.innerHTML = `<option value="" disabled selected>${i18n[currentLang].selectPlaceholder}</option>`;
+  if (!select) return;
+  const t = i18n[currentLang] || i18n['hy'];
+  select.innerHTML = `<option value="" disabled selected>${t.selectPlaceholder}</option>`;
   
   partnerRestaurants.forEach(r => {
     const opt = document.createElement('option');
     opt.value = r.id;
-    opt.innerText = `${r.name} (${r.avgKg} ${i18n[currentLang].unitKg}/day)`;
+    opt.innerText = `${r.name} (${r.avgKg} ${t.unitKg}/day)`;
     select.appendChild(opt);
   });
 }
 
 function applyLanguage(lang) {
   const t = i18n[lang];
-  document.getElementById('appTitle').innerText = t.appTitle;
-  document.getElementById('appSubtitle').innerText = t.appSubtitle;
-  document.getElementById('langLabel').innerText = t.langLabel;
-  document.getElementById('stat1Title').innerText = t.stat1Title;
-  document.getElementById('stat2Title').innerText = t.stat2Title;
-  document.getElementById('stat3Title').innerText = t.stat3Title;
-  document.getElementById('restFormTitle').innerText = t.restFormTitle;
-  document.getElementById('restSelectLabel').innerText = t.restSelectLabel;
-  document.getElementById('restLocLabel').innerText = t.restLocLabel;
-  document.getElementById('restWeightLabel').innerText = t.restWeightLabel;
-  document.getElementById('btnPickup').innerText = t.btnPickup;
-  document.getElementById('farmerFormTitle').innerText = t.farmerFormTitle;
-  document.getElementById('farmerNameLabel').innerText = t.farmerNameLabel;
-  document.getElementById('farmerLocLabel').innerText = t.farmerLocLabel;
-  document.getElementById('farmerQtyLabel').innerText = t.farmerQtyLabel;
-  document.getElementById('btnOrder').innerText = t.btnOrder;
-  document.getElementById('tableTitle').innerText = t.tableTitle;
-  document.getElementById('thId').innerText = t.thId;
-  document.getElementById('thRest').innerText = t.thRest;
-  document.getElementById('thAddress').innerText = t.thAddress;
-  document.getElementById('thWeight').innerText = t.thWeight;
-  document.getElementById('thStatus').innerText = t.thStatus;
-  document.getElementById('footerText').innerText = t.footerText;
+  if (!t) return;
+
+  const setText = (id, text) => {
+    const el = document.getElementById(id);
+    if (el) el.innerText = text;
+  };
+
+  setText('appTitle', t.appTitle);
+  setText('appSubtitle', t.appSubtitle);
+  setText('langLabel', t.langLabel);
+  setText('stat1Title', t.stat1Title);
+  setText('stat2Title', t.stat2Title);
+  setText('stat3Title', t.stat3Title);
+  setText('restFormTitle', t.restFormTitle);
+  setText('restSelectLabel', t.restSelectLabel);
+  setText('restLocLabel', t.restLocLabel);
+  setText('restWeightLabel', t.restWeightLabel);
+  setText('btnPickup', t.btnPickup);
+  setText('farmerFormTitle', t.farmerFormTitle);
+  setText('farmerNameLabel', t.farmerNameLabel);
+  setText('farmerLocLabel', t.farmerLocLabel);
+  setText('farmerQtyLabel', t.farmerQtyLabel);
+  setText('btnOrder', t.btnOrder);
+  setText('tableTitle', t.tableTitle);
+  setText('thId', t.thId);
+  setText('thRest', t.thRest);
+  setText('thAddress', t.thAddress);
+  setText('thWeight', t.thWeight);
+  setText('thStatus', t.thStatus);
+  setText('footerText', t.footerText);
 
   populateRestaurantSelect();
 }
 
 async function fetchStats() {
-  const res = await fetch('/api/stats');
-  const data = await res.json();
-  const unit = i18n[currentLang].unitKg;
-  document.getElementById('totalWaste').innerText = `${data.totalWasteKg} ${unit}`;
-  document.getElementById('co2Saved').innerText = `${data.co2SavedKg} ${unit}`;
-  document.getElementById('activeRestaurants').innerText = partnerRestaurants.length;
+  try {
+    const res = await fetch('/api/stats');
+    const data = await res.json();
+    const t = i18n[currentLang] || i18n['hy'];
+    const totalWasteEl = document.getElementById('totalWaste');
+    const co2SavedEl = document.getElementById('co2Saved');
+    const activeRestEl = document.getElementById('activeRestaurants');
+
+    if (totalWasteEl) totalWasteEl.innerText = `${data.totalWasteKg} ${t.unitKg}`;
+    if (co2SavedEl) co2SavedEl.innerText = `${data.co2SavedKg} ${t.unitKg}`;
+    if (activeRestEl) activeRestEl.innerText = partnerRestaurants.length;
+  } catch (err) {
+    console.error(err);
+  }
 }
 
 async function fetchPickups() {
-  const res = await fetch('/api/pickups');
-  const pickups = await res.json();
-  const tbody = document.getElementById('pickupTableBody');
-  tbody.innerHTML = '';
+  try {
+    const res = await fetch('/api/pickups');
+    const pickups = await res.json();
+    const tbody = document.getElementById('pickupTableBody');
+    if (!tbody) return;
+    tbody.innerHTML = '';
 
-  const t = i18n[currentLang];
+    const t = i18n[currentLang] || i18n['hy'];
 
-  pickups.reverse().forEach(p => {
-    const isCompleted = p.status === 'Completed';
-    const statusText = isCompleted ? t.statusCompleted : t.statusPending;
+    pickups.reverse().forEach(p => {
+      const isCompleted = p.status === 'Completed';
+      const statusText = isCompleted ? t.statusCompleted : t.statusPending;
 
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td>#${p.id}</td>
-      <td><strong>${p.restaurant}</strong></td>
-      <td>${p.location}</td>
-      <td>${p.weightKg} ${t.unitKg}</td>
-      <td><span style="color: ${isCompleted ? '#2e7d32' : '#ed6c02'}; font-weight:600;">● ${statusText}</span></td>
-    `;
-    tbody.appendChild(tr);
-  });
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>#${p.id}</td>
+        <td><strong>${p.restaurant}</strong></td>
+        <td>${p.location}</td>
+        <td>${p.weightKg} ${t.unitKg}</td>
+        <td><span style="color: ${isCompleted ? '#2e7d32' : '#ed6c02'}; font-weight:600;">● ${statusText}</span></td>
+      `;
+      tbody.appendChild(tr);
+    });
+  } catch (err) {
+    console.error(err);
+  }
 }
