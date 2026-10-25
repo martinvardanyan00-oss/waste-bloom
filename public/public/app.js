@@ -32,6 +32,7 @@ const i18n = {
     farmerQtyLabel: "Քանակ (Տոննա)",
     btnOrder: "Պատվիրել Պարարտանյութ",
     tableTitle: "📋 Վերջին Հավաքագրման Հայտերը",
+    thId: "ID",
     thRest: "Ռեստորան",
     thAddress: "Հասցե",
     thWeight: "Քանակ (կգ)",
@@ -40,7 +41,8 @@ const i18n = {
     alertPickup: "Հավաքագրման հայտը հաջողությամբ գրանցվեց:",
     alertOrder: "Պարարտանյութի պատվերը գրանցվեց:",
     statusCompleted: "Ավարտված",
-    statusPending: "Սպասման մեջ"
+    statusPending: "Սպասման մեջ",
+    unitKg: "կգ"
   },
   en: {
     appTitle: "🌱 EcoWaste Armenia",
@@ -61,6 +63,7 @@ const i18n = {
     farmerQtyLabel: "Quantity (Tons)",
     btnOrder: "Order Eco-Compost",
     tableTitle: "📋 Recent Pickup Requests",
+    thId: "ID",
     thRest: "Restaurant",
     thAddress: "Address",
     thWeight: "Volume (kg)",
@@ -69,7 +72,8 @@ const i18n = {
     alertPickup: "Pickup request registered successfully!",
     alertOrder: "Compost order placed successfully!",
     statusCompleted: "Completed",
-    statusPending: "Pending"
+    statusPending: "Pending",
+    unitKg: "kg"
   },
   ru: {
     appTitle: "🌱 EcoWaste Armenia",
@@ -90,6 +94,7 @@ const i18n = {
     farmerQtyLabel: "Количество (Тонны)",
     btnOrder: "Заказать компост",
     tableTitle: "📋 Последние заявки на вывоз",
+    thId: "ID",
     thRest: "Ресторан",
     thAddress: "Адрес",
     thWeight: "Вес (кг)",
@@ -98,18 +103,22 @@ const i18n = {
     alertPickup: "Заявка на вывоз успешно зарегистрирована!",
     alertOrder: "Заказ на компост успешно оформлен!",
     statusCompleted: "Завершено",
-    statusPending: "В ожидании"
+    statusPending: "В ожидании",
+    unitKg: "кг"
   }
 };
 
 let currentLang = 'hy';
 
 document.addEventListener('DOMContentLoaded', () => {
+  const langSelect = document.getElementById('langSelect');
+  langSelect.value = currentLang;
+
   populateRestaurantSelect();
   fetchStats();
   fetchPickups();
 
-  document.getElementById('langSelect').addEventListener('change', (e) => {
+  langSelect.addEventListener('change', (e) => {
     currentLang = e.target.value;
     applyLanguage(currentLang);
     fetchPickups();
@@ -127,6 +136,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('pickupForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     const selectElem = document.getElementById('restSelect');
+    if (!selectElem.value) return;
     const restaurantName = selectElem.options[selectElem.selectedIndex].text.split(' (')[0];
     const location = document.getElementById('restLoc').value;
     const weightKg = document.getElementById('restWeight').value;
@@ -141,6 +151,7 @@ document.addEventListener('DOMContentLoaded', () => {
       alert(i18n[currentLang].alertPickup);
       document.getElementById('pickupForm').reset();
       document.getElementById('restLoc').value = '';
+      populateRestaurantSelect();
       fetchStats();
       fetchPickups();
     }
@@ -172,7 +183,7 @@ function populateRestaurantSelect() {
   partnerRestaurants.forEach(r => {
     const opt = document.createElement('option');
     opt.value = r.id;
-    opt.innerText = `${r.name} (${r.avgKg} kg/day)`;
+    opt.innerText = `${r.name} (${r.avgKg} ${i18n[currentLang].unitKg}/day)`;
     select.appendChild(opt);
   });
 }
@@ -196,6 +207,7 @@ function applyLanguage(lang) {
   document.getElementById('farmerQtyLabel').innerText = t.farmerQtyLabel;
   document.getElementById('btnOrder').innerText = t.btnOrder;
   document.getElementById('tableTitle').innerText = t.tableTitle;
+  document.getElementById('thId').innerText = t.thId;
   document.getElementById('thRest').innerText = t.thRest;
   document.getElementById('thAddress').innerText = t.thAddress;
   document.getElementById('thWeight').innerText = t.thWeight;
@@ -208,8 +220,9 @@ function applyLanguage(lang) {
 async function fetchStats() {
   const res = await fetch('/api/stats');
   const data = await res.json();
-  document.getElementById('totalWaste').innerText = `${data.totalWasteKg} կգ`;
-  document.getElementById('co2Saved').innerText = `${data.co2SavedKg} կգ`;
+  const unit = i18n[currentLang].unitKg;
+  document.getElementById('totalWaste').innerText = `${data.totalWasteKg} ${unit}`;
+  document.getElementById('co2Saved').innerText = `${data.co2SavedKg} ${unit}`;
   document.getElementById('activeRestaurants').innerText = partnerRestaurants.length;
 }
 
@@ -230,7 +243,7 @@ async function fetchPickups() {
       <td>#${p.id}</td>
       <td><strong>${p.restaurant}</strong></td>
       <td>${p.location}</td>
-      <td>${p.weightKg} կգ</td>
+      <td>${p.weightKg} ${t.unitKg}</td>
       <td><span style="color: ${isCompleted ? '#2e7d32' : '#ed6c02'}; font-weight:600;">● ${statusText}</span></td>
     `;
     tbody.appendChild(tr);
